@@ -1,0 +1,37 @@
+body{
+  padding: 25px;
+}
+.title {
+	color: #FFFFF;
+		font-size: 100px;
+
+	  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.timer {
+	color: #FFFFF;
+	font-size: 150px;
+	  display: flex;
+  justify-content: center;
+  align-items: center;
+  display: none;
+}
+
+.button {
+	padding: 5px 20px;
+	
+}
+
+.no-text{
+	color: #FFFFF;
+		font-size: 100px;
+
+	  display: flex;
+  justify-content: center;
+  align-items: center;
+  display: none;
+}
+
+
