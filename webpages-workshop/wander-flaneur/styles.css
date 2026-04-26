@@ -1,0 +1,29 @@
+body{
+  padding: 25px;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 1rem;
+  gap: 0.5rem;
+}
+
+.container div {
+  padding: 10px;
+  font-size: 1rem;
+  text-align: left;
+}
+
+a {
+  color: blue;
+}
+
+.container a {
+  opacity: 0;
+  
+}
+
+.container a:hover {
+  opacity: 1;
+}
