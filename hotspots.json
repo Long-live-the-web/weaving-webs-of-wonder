@@ -1,0 +1,9 @@
+{
+  "image": "wall-imgs/LLW_main_web.jpg",
+  "imageAlt": "weaving webs of wonder",
+  "links": {
+    "dontbeevil":      { "title": "don't be evil",   "x": 20, "y": 85 },
+    "scrolling-timer": { "title": "scrolling timer", "x": 50, "y": 85 },
+    "wander-flaneur":  { "title": "wander flâneur",  "x": 80, "y": 85 }
+  }
+}

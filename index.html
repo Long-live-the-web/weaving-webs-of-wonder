@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>weaving webs of wonder</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #fff;
+      font-family: system-ui, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      box-sizing: border-box;
+    }
+    .stage {
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+      line-height: 0;
+    }
+    .stage img {
+      display: block;
+      max-width: 100%;
+      max-height: 90vh;
+      height: auto;
+      width: auto;
+    }
+    .stage a {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      color: #1a0dab;
+      text-decoration: underline;
+      font-size: 18px;
+      line-height: 1.2;
+      white-space: nowrap;
+      text-shadow: 0 0 4px #fff, 0 0 4px #fff;
+    }
+    .stage a:visited { color: #1a0dab; }
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage"><img id="img" alt="" /></div>
+  <script>
+    fetch('pages.json').then(r => r.json()).then(data => {
+      const img = document.getElementById('img');
+      img.src = data.image;
+      img.alt = data.imageAlt || '';
+      const stage = document.getElementById('stage');
+      for (const p of data.pages) {
+        const a = document.createElement('a');
+        a.href = `webpages-workshop/${p.folder}/`;
+        a.textContent = p.title;
+        a.style.left = p.x + '%';
+        a.style.top = p.y + '%';
+        stage.appendChild(a);
+      }
+    });
+  </script>
+</body>
+</html>
