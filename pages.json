@@ -1,0 +1,54 @@
+{
+  "columns": 7,
+  "tiles": [
+    "wall-imgs/IMG_2592.jpeg",
+    "wall-imgs/IMG_2593.jpeg",
+    "wall-imgs/IMG_2594.jpeg",
+    "wall-imgs/IMG_2595.jpeg",
+    "wall-imgs/IMG_2596.jpeg",
+    "wall-imgs/IMG_2597.jpeg",
+    "wall-imgs/IMG_2598.jpeg",
+    "wall-imgs/IMG_2599.jpeg",
+    "wall-imgs/IMG_2600.jpeg",
+    "wall-imgs/IMG_2601.jpeg",
+    "wall-imgs/IMG_2602.jpeg",
+    "wall-imgs/IMG_2603.jpeg",
+    "wall-imgs/IMG_2604.jpeg",
+    "wall-imgs/IMG_2605.jpeg"
+  ],
+  "pages": [
+    {
+      "folder": "dontbeevil",
+      "title": "don't be evil",
+      "hotspot": {
+        "title": "don't be evil",
+        "x": 2,
+        "y": 2,
+        "width": 31,
+        "height": 96
+      }
+    },
+    {
+      "folder": "scrolling-timer",
+      "title": "scrolling timer",
+      "hotspot": {
+        "title": "scrolling timer",
+        "x": 34,
+        "y": 2,
+        "width": 31,
+        "height": 96
+      }
+    },
+    {
+      "folder": "wander-flaneur",
+      "title": "wander flâneur",
+      "hotspot": {
+        "title": "wander flâneur",
+        "x": 66,
+        "y": 2,
+        "width": 32,
+        "height": 96
+      }
+    }
+  ]
+}

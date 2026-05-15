@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>weaving webs of wonder</title>
+  <style>
+    body { margin: 0; background: #111; font-family: system-ui, sans-serif; }
+    .stage { position: relative; max-width: 100%; }
+    .wall { display: grid; gap: 0; width: 100%; }
+    .wall img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+    .hotspot { position: absolute; border-radius: 4px; }
+    .hotspot:hover { background: rgba(255,255,255,0.15); box-shadow: inset 0 0 0 2px #fff; }
+    body.debug .hotspot { background: rgba(255,80,80,0.25); box-shadow: inset 0 0 0 2px red; }
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="wall" id="wall"></div>
+  </div>
+  <script>
+    if (location.search.includes('debug')) document.body.classList.add('debug');
+    fetch('pages.json').then(r => r.json()).then(data => {
+      const wall = document.getElementById('wall');
+      wall.style.gridTemplateColumns = `repeat(${data.columns}, 1fr)`;
+      for (const src of data.tiles) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = '';
+        wall.appendChild(img);
+      }
+      const stage = document.getElementById('stage');
+      for (const p of data.pages) {
+        const a = document.createElement('a');
+        a.href = `webpages-workshop/${p.folder}/`;
+        a.className = 'hotspot';
+        a.title = p.title;
+        Object.assign(a.style, {
+          left: p.hotspot.x + '%', top: p.hotspot.y + '%',
+          width: p.hotspot.width + '%', height: p.hotspot.height + '%'
+        });
+        stage.appendChild(a);
+      }
+    });
+  </script>
+</body>
+</html>

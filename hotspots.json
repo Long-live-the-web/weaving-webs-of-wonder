@@ -1,0 +1,8 @@
+{
+  "columns": 7,
+  "hotspots": {
+    "dontbeevil":      { "title": "don't be evil",   "x": 2,  "y": 2, "width": 31, "height": 96 },
+    "scrolling-timer": { "title": "scrolling timer", "x": 34, "y": 2, "width": 31, "height": 96 },
+    "wander-flaneur":  { "title": "wander flâneur",  "x": 66, "y": 2, "width": 32, "height": 96 }
+  }
+}
