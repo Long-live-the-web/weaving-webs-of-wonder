@@ -9,6 +9,12 @@
       "y": 85
     },
     {
+      "folder": "localNetwork",
+      "title": "your new WIP digital doorstep",
+      "x": 20,
+      "y": 50
+    },
+    {
       "folder": "scrolling-timer",
       "title": "scrolling timer",
       "x": 50,
