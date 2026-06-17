@@ -1,0 +1,18 @@
+body{
+  padding: 12px;
+
+  cursor:
+    url(https://cdn.custom-cursor.com/db/17821/32/games-club-penguin-g-billy-drumsticks-pointer.png),
+    pointer !important;
+}
+.title {
+	color: #C73C3C;
+font-size:10px
+}
+
+a:hover {
+  color: red;
+  background-color: yellow;
+  font-size: 40px;
+}
+  
