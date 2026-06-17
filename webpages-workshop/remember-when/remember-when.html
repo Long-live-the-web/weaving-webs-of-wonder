@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>remember when the internet was a specific place? </title>
+    <link rel="stylesheet" href="styles.css" />
+    
+    
+    <style>
+  body {
+    height: 2000px; /* just to show scrolling underneath */
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+
+  /* Example content */
+  .content {
+    padding: 40px;
+  }
+
+  /* Moving image */
+  .floating-image {
+    position: fixed;        /* stays on top of everything */
+    top: 50%;
+    left: -150px;           /* start off-screen */
+    transform: translateY(-50%);
+    z-index: 9999;          /* ensures it's above all elements */
+    width: 120px;
+    pointer-events: none;   /* allows clicks through it */
+
+    animation: moveAcross 8s linear infinite;
+  }
+
+  @keyframes moveAcross {
+    0% {
+      left: -150px;
+    }
+    100% {
+      left: 110%;
+    }
+  }
+</style>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  </head>
+  <body>
+      <h1 class="title"  style="font-family: Trebuchet MS" > remember when the internet was a specific place? </h1>
+    <a href="url"> REMEMBER </a>
+    
+    <a href="url"> FORGET </a> <br />
+
+      <script src="script.js"></script>
+      <img src="https://uploads.onecompiler.io/44mdr59sq/44mghcxnb/viber_image_2026-04-26_13-08-55-934.jpg" alt="remember when the internet was a specific place?"    width="800" 
+      >
+      
+      <marquee behavior="scroll" direction="left">My sister playing sims in the family computer</marquee>
+
+      
+      <img src="https://uploads.onecompiler.io/44mdr59sq/44mghcxnb/Screenshot%202026-03-25%20114442.png" alt="my sister in the family computer"    width="500" 
+      >
+</br>
+
+   <img src="https://uploads.onecompiler.io/44mdr59sq/44mghcxnb/Screenshot%202026-04-26%20124902.png" alt="my sister in the family computer"    width="500" 
+      >
+
+
+
+
+
+<div class="content">
+  <h1>Page Content</h1>
+  <p>This is your normal page content. The image moves above everything.</p>
+</div>
+
+<img src="https://uploads.onecompiler.io/44mdr59sq/44mdqggrk/Screenshot%202026-04-21%20202945.png" class="floating-image" alt="Moving" width="100">
+
+
+
+
+
+      
+      
+      
+      
+  </body>
+</html>
