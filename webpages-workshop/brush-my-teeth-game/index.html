@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brush My Teeth!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --mint: #a8edda; --lip-top: #e8637a; --mouth: #1a0a0e; --tongue: #e8748a; }
+    body {
+      font-family: 'Fredoka One', cursive;
+      background: var(--mint);
+      background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.25) 0%, transparent 40%),
+                        radial-gradient(circle at 80% 70%, rgba(100,220,190,0.3) 0%, transparent 50%);
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; overflow: hidden; cursor: none; user-select: none;
+    }
+    h1 { font-size: clamp(1.8rem,4vw,3rem); color: #1a0a0e; text-shadow: 3px 3px 0 #fff, 5px 5px 0 #e8637a; margin-bottom: 1.2rem; }
+    #progress-wrap { width: min(500px,90vw); background:#fff; border:4px solid #222; border-radius:999px; height:22px; margin-bottom:1.4rem; overflow:hidden; box-shadow:3px 3px 0 #222; }
+    #progress-bar  { height:100%; width:0%; background:linear-gradient(90deg,#6ee7b7,#34d399); border-radius:999px; transition:width 0.2s; }
+    #scene         { position:relative; width:min(520px,92vw); height:min(340px,60vw); }
+    #mouth-outer   { position:absolute; inset:0; background:var(--lip-top); border-radius:50% 50% 60% 60% / 30% 30% 70% 70%; border:4px solid #222; box-shadow:5px 5px 0 #222; }
+    #mouth-inner   { position:absolute; left:7%; right:7%; top:22%; bottom:5%; background:var(--mouth); border-radius:40% 40% 55% 55% / 30% 30% 70% 70%; border:4px solid #222; overflow:hidden; }
+    #tongue        { position:absolute; left:50%; transform:translateX(-50%); bottom:-4px; width:56%; height:54%; background:var(--tongue); border-radius:50% 50% 48% 48% / 60% 60% 40% 40%; border:3px solid #b5485e; animation:tongue-wiggle 2.4s ease-in-out infinite; }
+    @keyframes tongue-wiggle { 0%,100%{transform:translateX(-50%) scaleX(1)} 40%{transform:translateX(-50%) scaleX(1.06)} 70%{transform:translateX(-50%) scaleX(0.95)} }
+    .tooth         { position:absolute; background:#f8f5e4; border:3px solid #222; border-radius:0 0 8px 8px; overflow:hidden; top:2%; }
+    .tooth .dirt   { position:absolute; inset:0; background:linear-gradient(160deg,#c9a227cc 0%,#8b5e1a99 60%,transparent 100%); border-radius:inherit; transition:opacity 0.15s; pointer-events:none; }
+    .tooth.flash   { animation:tooth-flash 0.35s ease-out; }
+    @keyframes tooth-flash { 0%{filter:brightness(1)} 50%{filter:brightness(2.5) saturate(0)} 100%{filter:brightness(1)} }
+    #brush { position:fixed; pointer-events:none; z-index:100; transform:rotate(-30deg); }
+    #brush svg { width:120px; height:auto; filter:drop-shadow(3px 3px 0px #222); }
+    #brush.scrubbing { animation:scrub 0.12s ease-in-out infinite alternate; }
+    @keyframes scrub { from{transform:rotate(-30deg) translateY(0)} to{transform:rotate(-28deg) translateY(-3px)} }
+    #victory { display:none; position:fixed; inset:0; background:rgba(10,5,8,0.75); z-index:200; flex-direction:column; align-items:center; justify-content:center; gap:1.2rem; }
+    #victory.show { display:flex; }
+    #victory canvas { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+    #victory h2 { font-size:clamp(2rem,6vw,4rem); color:#fff; text-shadow:4px 4px 0 #e8637a,7px 7px 0 #222; position:relative; z-index:1; text-align:center; }
+    #victory p  { font-family:'Nunito',sans-serif; color:#a8edda; font-size:1.2rem; position:relative; z-index:1; }
+    #play-again { position:relative; z-index:1; font-family:'Fredoka One',cursive; font-size:1.4rem; background:#e8637a; color:#fff; border:4px solid #222; border-radius:999px; padding:0.6rem 2rem; cursor:pointer; box-shadow:4px 4px 0 #222; transition:transform 0.1s,box-shadow 0.1s; }
+    #play-again:hover  { transform:translate(-2px,-2px); box-shadow:6px 6px 0 #222; }
+    #play-again:active { transform:translate(2px,2px);   box-shadow:2px 2px 0 #222; }
+    #hint { margin-top:1rem; font-family:'Nunito',sans-serif; font-size:0.95rem; color:#1a5c4a; opacity:0.8; }
+  </style>
+</head>
+<body>
+<h1>&#x1F9B7; Brush My Teeth!</h1>
+<div id="progress-wrap"><div id="progress-bar"></div></div>
+<div id="scene">
+  <div id="mouth-outer">
+    <div id="mouth-inner">
+      <div id="tongue"></div>
+    </div>
+  </div>
+</div>
+<p id="hint">Move your mouse over the teeth to brush them!</p>
+<div id="brush">
+  <svg viewBox="0 0 60 200" xmlns="http://www.w3.org/2000/svg">
+    <rect x="22" y="60" width="16" height="130" rx="8" fill="#4aaeff" stroke="#222" stroke-width="3"/>
+    <rect x="22" y="100" width="16" height="6" rx="3" fill="#2277cc" stroke="#222" stroke-width="1.5"/>
+    <rect x="22" y="114" width="16" height="6" rx="3" fill="#2277cc" stroke="#222" stroke-width="1.5"/>
+    <rect x="22" y="128" width="16" height="6" rx="3" fill="#2277cc" stroke="#222" stroke-width="1.5"/>
+    <rect x="12" y="10" width="36" height="58" rx="10" fill="#fff" stroke="#222" stroke-width="3"/>
+    <line x1="21" y1="14" x2="21" y2="34" stroke="#66ccff" stroke-width="3" stroke-linecap="round"/>
+    <line x1="29" y1="14" x2="29" y2="34" stroke="#66ccff" stroke-width="3" stroke-linecap="round"/>
+    <line x1="37" y1="14" x2="37" y2="34" stroke="#66ccff" stroke-width="3" stroke-linecap="round"/>
+    <line x1="21" y1="38" x2="21" y2="58" stroke="#66ccff" stroke-width="3" stroke-linecap="round"/>
+    <line x1="29" y1="38" x2="29" y2="58" stroke="#66ccff" stroke-width="3" stroke-linecap="round"/>
+    <line x1="37" y1="38" x2="37" y2="58" stroke="#66ccff" stroke-width="3" stroke-linecap="round"/>
+  </svg>
+</div>
+<div id="victory">
+  <canvas id="confetti-canvas"></canvas>
+  <h2>&#x2728; Sparkling Clean!</h2>
+  <p>Your teeth are gleaming white!</p>
+  <button id="play-again">Play Again &#x1F389;</button>
+</div>
+<script>
+const TOOTH_COUNT=8,SCRUB_SPEED=1.8,CLEAN_THRESH=100;
+const mouthInner=document.getElementById('mouth-inner');
+const progressBar=document.getElementById('progress-bar');
+const brush=document.getElementById('brush');
+const victoryEl=document.getElementById('victory');
+const confettiCanvas=document.getElementById('confetti-canvas');
+const ctx2=confettiCanvas.getContext('2d');
+let teeth=[],mouseX=-300,mouseY=-300,gameOver=false,confettiRunning=false,confettiPieces=[];
+let audioCtx=null,scrubGain=null,audioReady=false;
+
+function buildTeeth(){
+  mouthInner.querySelectorAll('.tooth').forEach(t=>t.remove());
+  teeth=[];
+  const totalW=mouthInner.offsetWidth;
+  const toothW=Math.floor((totalW*0.86)/TOOTH_COUNT);
+  const toothH=Math.floor(mouthInner.offsetHeight*0.38);
+  const startX=Math.floor(totalW*0.07);
+  for(let i=0;i<TOOTH_COUNT;i++){
+    const el=document.createElement('div');
+    el.className='tooth';
+    el.style.width=toothW-4+'px';
+    el.style.height=toothH+'px';
+    el.style.left=startX+i*toothW+'px';
+    el.style.top='2%';
+    const dirt=document.createElement('div');
+    dirt.className='dirt';
+    el.appendChild(dirt);
+    mouthInner.appendChild(el);
+    teeth.push({el,dirt,cleanliness:0});
+  }
+}
+buildTeeth();
+window.addEventListener('resize',buildTeeth);
+
+document.addEventListener('mousemove',e=>{
+  mouseX=e.clientX;mouseY=e.clientY;
+  brush.style.left=mouseX-20+'px';
+  brush.style.top=mouseY-180+'px';
+  initAudio();
+});
+
+function initAudio(){
+  if(audioReady)return;
+  audioReady=true;
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  const o1=audioCtx.createOscillator();o1.type='sawtooth';o1.frequency.value=180;
+  const o2=audioCtx.createOscillator();o2.type='sawtooth';o2.frequency.value=267;
+  scrubGain=audioCtx.createGain();scrubGain.gain.value=0;
+  const f=audioCtx.createBiquadFilter();f.type='bandpass';f.frequency.value=800;f.Q.value=0.8;
+  o1.connect(f);o2.connect(f);f.connect(scrubGain);scrubGain.connect(audioCtx.destination);
+  o1.start();o2.start();
+}
+function setScrubSound(on){
+  if(!audioReady||!scrubGain)return;
+  scrubGain.gain.setTargetAtTime(on?0.06:0,audioCtx.currentTime,0.03);
+}
+function playPing(freq){
+  if(!audioReady)return;
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.type='sine';o.frequency.value=freq;
+  g.gain.setValueAtTime(0.35,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.5);
+  o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.5);
+}
+function playVictory(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>playPing(f),i*140));}
+
+function getBrushRect(){return{left:mouseX-6,right:mouseX+26,top:mouseY-175,bottom:mouseY-122};}
+function overlaps(a,b){return a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;}
+
+function gameLoop(){
+  if(!gameOver){
+    const bRect=getBrushRect();let anyScrub=false,total=0;
+    teeth.forEach((t,idx)=>{
+      if(t.cleanliness>=CLEAN_THRESH){total+=CLEAN_THRESH;return;}
+      const r=t.el.getBoundingClientRect();
+      if(overlaps(bRect,r)){
+        anyScrub=true;
+        t.cleanliness=Math.min(CLEAN_THRESH,t.cleanliness+SCRUB_SPEED);
+        t.dirt.style.opacity=1-t.cleanliness/CLEAN_THRESH;
+        if(t.cleanliness>=CLEAN_THRESH){
+          t.el.classList.add('flash');
+          t.el.addEventListener('animationend',()=>t.el.classList.remove('flash'),{once:true});
+          playPing(660+idx*40);
+        }
+      }
+      total+=t.cleanliness;
+    });
+    brush.classList.toggle('scrubbing',anyScrub);
+    setScrubSound(anyScrub);
+    progressBar.style.width=(total/(CLEAN_THRESH*TOOTH_COUNT)*100).toFixed(1)+'%';
+    if(total>=CLEAN_THRESH*TOOTH_COUNT)triggerVictory();
+  }
+  requestAnimationFrame(gameLoop);
+}
+gameLoop();
+
+function triggerVictory(){
+  gameOver=true;setScrubSound(false);playVictory();
+  victoryEl.classList.add('show');startConfetti();
+}
+function startConfetti(){
+  confettiCanvas.width=window.innerWidth;confettiCanvas.height=window.innerHeight;
+  confettiPieces=Array.from({length:140},()=>({
+    x:Math.random()*confettiCanvas.width,y:Math.random()*-confettiCanvas.height,
+    w:8+Math.random()*12,h:6+Math.random()*8,
+    color:['#e8637a','#4aaeff','#ffd166','#06d6a0','#a8edda','#fff'][Math.floor(Math.random()*6)],
+    rot:Math.random()*Math.PI*2,rotV:(Math.random()-0.5)*0.12,
+    vx:(Math.random()-0.5)*3,vy:2+Math.random()*4
+  }));
+  confettiRunning=true;drawConfetti();
+}
+function drawConfetti(){
+  if(!confettiRunning)return;
+  ctx2.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+  confettiPieces.forEach(p=>{
+    ctx2.save();ctx2.translate(p.x,p.y);ctx2.rotate(p.rot);
+    ctx2.fillStyle=p.color;ctx2.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx2.restore();
+    p.x+=p.vx;p.y+=p.vy;p.rot+=p.rotV;
+    if(p.y>confettiCanvas.height+20){p.y=-20;p.x=Math.random()*confettiCanvas.width;}
+  });
+  requestAnimationFrame(drawConfetti);
+}
+document.getElementById('play-again').addEventListener('click',()=>{
+  gameOver=false;confettiRunning=false;
+  ctx2.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+  victoryEl.classList.remove('show');
+  teeth.forEach(t=>{t.cleanliness=0;t.dirt.style.opacity=1;});
+  progressBar.style.width='0%';
+});
+</script>
+</body>
+</html>
