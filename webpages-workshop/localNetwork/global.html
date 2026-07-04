@@ -4,44 +4,73 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Global</title>
+    <script src="https://cdn.jsdelivr.net/npm/p5@2.3.0/lib/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5.sound@0.3.0/dist/p5.sound.min.js"></script>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body class="global">
-    <button class="toggle-btn" onclick="togglePage()">Switch to Local</button>
+    <nav>
+      <a href="index.html"> back to the doorstep </a>
+      <button class="toggle-btn" onclick="togglePage()">Switch to Local</button>
+    </nav>
     <main>
-      <h1>What can you do on the Global Network?</h1>
+      <h1>What do you wish to find in places far away from you?</h1>
       <div class="activities">
         <ul>
           <h2>Get inspired</h2>
-          <li>Shopping</li>
-          <li>Window shopping</li>
-          <li>Inspiration (that ends up in imporster syndrom)</li>
+          <li>think <strong>while staying in your bubble</strong></li>
+          <li>
+            learn <strong> infinite things, but also inside your bubble</strong>
+          </li>
+          <li>
+            research <strong> on resources the algorithm suggests</strong>
+          </li>
+          <li>find inspiration (that often ends up to imposter syndrome)</li>
         </ul>
-
         <ul>
           <h2>Consume</h2>
-          <li>Get inspired</li>
-          <li>Shopping</li>
-          <li>Window shopping</li>
+          <li>
+            Shopping <strong> from markets that algorithm suggests</strong>
+          </li>
+          <li>Window shopping <strong> in your bubble</strong></li>
           <li>find crazy deals for furniture</li>
+          <li>check clothes (that i never buy)</li>
         </ul>
 
         <ul>
-          <h2>Communicate</h2>
-          <li>talk with my friends</li>
+          <h2>Connect</h2>
+          <li>chat with my friends <strong> in big tech platforms</strong></li>
+          <li>arrange to meet with friends</li>
+          <li>to see: me / my devil</li>
+          <li>find events <strong>promoted by algorithms</strong></li>
+        </ul>
+
+        <ul>
+          <h2>Get Informed</h2>
+          <li>read news (that depress me)</li>
+          <li>check what's on</li>
         </ul>
 
         <ul>
           <h2>Have fun</h2>
           <li>spend time</li>
           <li>cursed memes</li>
-          <li>watch movies</li>
-          <li>watch videos</li>
+          <li>watch movies <strong>from streaming services</strong></li>
+          <li>watch videos <strong>with advertisements</strong></li>
+          <li>change my face</li>
+          <li>play bubble trouble</li>
+          <li>
+            listen to music
+            <strong>from streaming services that exploit artists</strong>
+          </li>
+          <li>escape from this hellhole</li>
         </ul>
 
         <ul>
           <h2>Work / Produce</h2>
-          <li>Show my work</li>
+          <li>
+            Show my work <strong>and let models get trained on my data</strong>
+          </li>
           <li>think</li>
           <li>learn</li>
         </ul>
@@ -54,8 +83,14 @@
           >what the participants of the Long Live the Web workshop usually do on
           the web
         </a>
+        <strong
+          >& colored by my grieving-the-web eyes at the time of writing
+          this</strong
+        >
       </p>
     </footer>
+    <script src="spiders.js"></script>
+
     <script>
       function togglePage() {
         window.location.href = "local.html";
