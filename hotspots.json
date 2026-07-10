@@ -6,6 +6,14 @@
     "scrolling-timer": { "title": "scrolling timer", "x": 50, "y": 85 },
     "wander-flaneur":  { "title": "wander flâneur",  "x": 80, "y": 85 },
     "localNetwork":     { "title": "your new WIP digital doorstep",     "x": 20, "y": 50 },
+<<<<<<< HEAD
 "scroll-less":     { "title": "scroll-less",     "x": 80, "y": 50 }
+=======
+    "do-you-see-me":   { "title": "do you see me?",  "x": 50, "y": 50 },
+    "brush-my-teeth":    { "title": "brush my teeth",   "x": 80, "y": 50 },
+    "remember-when" : { "title": "remember when",  "x": 20, "y": 15 },
+    "screenshot2": { "title": "screenshot",  "x": 50, "y": 15 },
+    "screenshotheaven": { "title": "screenshot heaven",  "x": 80, "y": 15 }
+>>>>>>> 9e0c7b7bab334bfdd2f0f1c0867e287256596a0e
   }
 }
