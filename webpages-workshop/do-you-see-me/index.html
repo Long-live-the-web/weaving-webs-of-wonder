@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>do you see me</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+  #b { display: none; }
+  #quote { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    color: red; font-family: Helvetica, sans-serif; font-size: 4vw; text-align: center; }
+</style>
+</head>
+<body>
+<img id="a" src="imges/additional_maps.jpg">
+<img id="b" src="imges/additional_maps (1).jpg">
+<div id="quote"></div>
+<script>
+const a = document.getElementById("a");
+const b = document.getElementById("b");
+const quote = document.getElementById("quote");
+const quotes = [
+  "have you seen my cookies?",
+  "do you know me better now?",
+  "i am not a monster",
+  "i just spend a lot of time online",
+  "do you see me?",
+  "do you like me less now?",
+  "i will give you my skin",
+  "it will be digital and always with you",
+  "in your pocket, in your hand, in your eyes",
+];
+let q = 0;
+function nextQuote() {
+  quote.textContent = quotes[q];
+  q = (q + 1) % quotes.length;
+  setTimeout(nextQuote, 3000);
+}
+nextQuote();
+function flash() {
+  const showA = Math.random() < 0.5;
+  a.style.display = showA ? "block" : "none";
+  b.style.display = showA ? "none" : "block";
+  setTimeout(flash, 50 + Math.random() * 600);
+}
+flash();
+</script>
+</body>
+</html>
