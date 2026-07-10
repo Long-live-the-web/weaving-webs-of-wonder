@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  <title>scroll less · HTML energy</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      color: #fff;
+      min-height: 100vh;
+      position: relative;
+      line-height: 1.4;
+      overflow-x: hidden;
+    }
+
+    .sky-background {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: url('sky-clouds.jpg');
+      background-size: cover; background-position: center; background-repeat: no-repeat; z-index: -3;
+      transition: opacity 0.5s ease;
+    }
+    .sky-background.img-error { opacity: 0; }
+    .sky-fallback {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(135deg, #1a6dbb 0%, #6bb5e8 50%, #f0d890 100%); z-index: -4;
+    }
+    .dark-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.35); z-index: -2;
+    }
+
+    .logo-container {
+      position: fixed; top: 20px; right: 20px; z-index: 200;
+      cursor: pointer;
+    }
+    .logo-img {
+      max-width: 120px; height: auto;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+      transform-origin: center center;
+      will-change: transform;
+    }
+    @media (max-width: 600px) {
+      .logo-img { max-width: 80px; }
+      .logo-container { top: 15px; right: 15px; }
+    }
+    @media (max-width: 600px) {
+      .logo-img { max-width: 80px; }
+      .logo-container { top: 15px; right: 15px; }
+    }
+
+    .app-container {
+      max-width: 720px; width: 90%; margin: 0 auto;
+      position: relative; z-index: 20; padding: 2rem 1rem 4rem;
+    }
+
+    .choice-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 1.8rem; text-align: left; cursor: pointer;
+      transition: all 0.5s ease; border-radius: 24px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      position: relative; overflow: hidden;
+    }
+    .choice-card:hover {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateX(8px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+    }
+    .choice-card.pop { animation: popEffect 0.5s ease forwards; }
+    @keyframes popEffect {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.06); opacity: 0.8; }
+      100% { transform: scale(0); opacity: 0; display: none; }
+    }
+    .choice-card h2 {
+      font-family: 'Hypha', 'Times New Roman', 'Georgia', serif;
+      font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.3px;
+    }
+    .choice-card p {
+      font-family: 'Manrope', system-ui, sans-serif; font-size: 0.9rem; opacity: 0.95;
+    }
+
+    .landing-screen { background: transparent; border: none; padding: 1rem 0; }
+
+    .hero-mini {
+      margin-bottom: 3rem; border-bottom: 2px solid rgba(255, 255, 255, 0.3); padding-bottom: 1.5rem;
+    }
+    .hero-mini p {
+      font-family: 'Manrope', system-ui, sans-serif;
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px;
+      color: #aaffdd; font-weight: 600; margin-bottom: 0.75rem;
+    }
+    .hero-mini h1 {
+      font-family: 'Hypha', 'Times New Roman', 'Georgia', serif;
+      font-size: 3rem; font-weight: 800; line-height: 1.1; color: white;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3); letter-spacing: -0.02em;
+    }
+    .hero-mini h1 span {
+      font-family: 'Hypha', 'Times New Roman', 'Georgia', serif;
+      color: #aaffdd; border-bottom: 3px solid #aaffdd; display: inline-block;
+    }
+    .letter-vibe {
+      font-family: 'Manrope', system-ui, sans-serif;
+      font-size: 0.7rem; letter-spacing: 2px; font-weight: 500;
+      color: rgba(255,255,255,0.9); margin-top: 1rem; text-transform: uppercase;
+    }
+
+    .choice-grid { display: flex; flex-direction: column; gap: 1.5rem; margin-top: 2rem; }
+    .choice-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+
+    /* "I want" divider */
+    .i-want-divider {
+      text-align: center;
+      font-family: 'Hypha', 'Times New Roman', 'Georgia', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.75);
+      letter-spacing: 0.05em;
+      padding: 0.2rem 0;
+      font-style: italic;
+    }
+
+    .mystery-message {
+      display: none; text-align: center; margin-top: 3rem; padding: 2rem;
+      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 32px;
+      animation: fadeInUp 0.9s ease;
+    }
+    .mystery-message.show { display: block; }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .mystery-message .question-mark {
+      font-size: 4rem; margin-bottom: 1rem; display: inline-block;
+      animation: wobble 2.5s ease-in-out infinite;
+    }
+    @keyframes wobble {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(4deg); }
+      75% { transform: rotate(-4deg); }
+    }
+    .mystery-message h3 {
+      font-family: 'Hypha', 'Times New Roman', 'Georgia', serif;
+      font-size: 2rem; font-weight: 700; margin-bottom: 1rem; color: #aaffdd;
+    }
+    .mystery-message p {
+      font-family: 'Manrope', system-ui, sans-serif;
+      font-size: 1rem; margin-bottom: 1.5rem; line-height: 1.5;
+    }
+    .reset-cards-btn {
+      background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.3); color: white;
+      padding: 0.6rem 1.5rem; font-family: 'Manrope', system-ui, sans-serif;
+      font-weight: 600; font-size: 0.9rem; cursor: pointer;
+      transition: all 0.2s ease; border-radius: 40px;
+    }
+    .reset-cards-btn:hover { background: rgba(255, 255, 255, 0.3); transform: scale(1.02); }
+
+    .swipe-screen { display: none; }
+    .swipe-screen.active { display: block; }
+
+    .swipe-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 2rem; flex-wrap: wrap; gap: 12px;
+      border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 0.75rem;
+    }
+    .back-to-landing {
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.3); color: white;
+      padding: 0.5rem 1.2rem; font-family: 'Manrope', system-ui, sans-serif;
+      font-weight: 600; font-size: 0.8rem; cursor: pointer;
+      transition: 0.1s linear; border-radius: 40px;
+    }
+    .back-to-landing:hover { background: rgba(255,255,255,0.2); border-color: #aaffdd; }
+    #swipeTitle {
+      font-family: 'Hypha', 'Times New Roman', 'Georgia', serif;
+      font-size: 1.8rem; font-weight: 800; letter-spacing: -0.3px;
+      background: rgba(0,0,0,0.4); backdrop-filter: blur(8px);
+      display: inline-block; padding: 0.2rem 1rem; border-radius: 40px;
+    }
+
+    .card-stack {
+      position: relative; width: 100%; min-height: 520px;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .swipe-card {
+      position: absolute; width: 100%; max-width: 500px;
+      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(4px);
+      color: #111; border: 1px solid rgba(255,255,255,0.5); border-radius: 24px;
+      padding: 2rem 1.8rem; cursor: grab;
+      transition: transform 0.45s ease, opacity 0.45s;
+      will-change: transform; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+    }
+    .swipe-card:active { cursor: grabbing; }
+    .card-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .card-title {
+      font-family: 'Hypha', 'Times New Roman', 'Georgia', serif;
+      font-size: 1.9rem; font-weight: 800; margin-bottom: 0.75rem; letter-spacing: -0.3px;
+    }
+    .card-alternative {
+      font-family: 'Manrope', system-ui, sans-serif;
+      font-size: 1rem; font-weight: 700;
+      background: rgba(0,0,0,0.05); display: inline-block;
+      padding: 0.4rem 1rem; margin: 0.8rem 0;
+      border-left: 6px solid #000; border-radius: 8px;
+    }
+    .card-description {
+      font-family: 'Manrope', system-ui, sans-serif; font-size: 0.9rem; color: #2c2b28;
+    }
+
+    .swipe-feedback {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 60px;
+      padding: 12px 24px; display: flex; align-items: center; gap: 12px;
+      z-index: 1000; opacity: 0; transition: opacity 0.35s ease;
+      pointer-events: none; white-space: nowrap;
+      font-family: 'Manrope', system-ui, sans-serif; font-weight: 600; font-size: 1rem;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    .swipe-feedback.show { opacity: 1; }
+    .swipe-feedback .feedback-icon { font-size: 1.5rem; }
+    .swipe-feedback .feedback-text { color: #aaffdd; }
+    .swipe-feedback .feedback-action { color: white; }
+
+    .indicators { display: flex; justify-content: center; gap: 12px; margin: 28px 0 16px; }
+    .dot { width: 10px; height: 10px; background-color: rgba(255,255,255,0.5); transition: all 0.1s; border-radius: 50%; }
+    .dot.active { background-color: #aaffdd; width: 30px; border-radius: 10px; }
+
+    .reset-btn {
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.3); color: white;
+      padding: 0.5rem 1.5rem; font-family: 'Manrope', system-ui, sans-serif;
+      font-weight: 600; cursor: pointer; transition: 0.1s; border-radius: 40px;
+    }
+    .reset-btn:hover { background: rgba(255,255,255,0.2); border-color: #aaffdd; }
+
+    .counter, .swipe-hint {
+      text-align: center; font-family: 'Manrope', system-ui, sans-serif;
+      font-size: 0.75rem; margin-top: 1rem; color: rgba(255,255,255,0.9);
+      background: rgba(0,0,0,0.4); backdrop-filter: blur(8px);
+      width: fit-content; margin-left: auto; margin-right: auto;
+      padding: 0.3rem 1rem; border-radius: 40px;
+    }
+    .swipe-hint { display: flex; gap: 20px; }
+
+    .empty-state {
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.5); border-radius: 24px;
+      padding: 2rem; text-align: center; color: black;
+    }
+    .empty-state h3 {
+      font-family: 'Hypha', 'Times New Roman', 'Georgia', serif;
+      font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;
+    }
+
+    .hello-bubble {
+      position: fixed; bottom: 30px; left: 30px;
+      background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 60px;
+      padding: 10px 20px; cursor: grab; z-index: 1000;
+      transition: transform 0.1s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2); user-select: none;
+    }
+    .hello-bubble:active { cursor: grabbing; }
+    .hello-bubble:hover { background: rgba(255, 255, 255, 0.3); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+    .hello-bubble.pop { animation: bubblePop 0.5s ease forwards; }
+    @keyframes bubblePop {
+      0% { transform: scale(1); opacity: 1; }
+      30% { transform: scale(1.08); opacity: 0.9; }
+      100% { transform: scale(0); opacity: 0; display: none; }
+    }
+    .bubble-content { display: flex; align-items: center; gap: 12px; }
+    .bubble-text {
+      font-family: 'Manrope', system-ui, sans-serif; font-size: 1.1rem;
+      font-weight: 600; color: #aaffdd; text-shadow: 0 0 5px rgba(0,0,0,0.3);
+    }
+    .bubble-controls { display: none; gap: 8px; }
+    .hello-bubble:hover .bubble-controls { display: flex; }
+    .bubble-controls button {
+      background: rgba(255,255,255,0.2); border: none; color: white; cursor: pointer;
+      font-size: 0.7rem; padding: 4px 10px; border-radius: 30px;
+      font-family: 'Manrope', system-ui, sans-serif; transition: all 0.1s;
+    }
+    .bubble-controls button:hover { background: #aaffdd; color: black; }
+    .hello-bubble.hidden { display: none; }
+
+    @media (max-width: 600px) {
+      .app-container { width: 95%; padding: 1rem 0.5rem; }
+      .hero-mini h1 { font-size: 2.2rem; }
+      .choice-card h2 { font-size: 1.5rem; }
+      .card-title { font-size: 1.5rem; }
+      .hello-bubble { bottom: 15px; left: 15px; padding: 8px 15px; }
+      .bubble-text { font-size: 0.9rem; }
+      .mystery-message h3 { font-size: 1.5rem; }
+      .mystery-message .question-mark { font-size: 3rem; }
+      .swipe-feedback { padding: 8px 18px; font-size: 0.85rem; }
+      .swipe-feedback .feedback-icon { font-size: 1.2rem; }
+      .i-want-divider { font-size: 1.1rem; }
+      /* Mobile: bigger touch targets */
+      .back-to-landing { padding: 0.7rem 1.4rem; font-size: 0.85rem; }
+      .reset-btn { padding: 0.65rem 1.8rem; font-size: 0.85rem; }
+      .swipe-hint { font-size: 0.7rem; flex-wrap: wrap; gap: 10px; justify-content: center; }
+      /* Mobile: hide keyboard hint */
+      .swipe-hint .hint-keys { display: none; }
+      /* Back to top button smaller on mobile */
+      .back-to-top { width: 42px; height: 42px; font-size: 1rem; right: 14px; bottom: 14px; }
+    }
+
+    /* ---------- BACK TO TOP BUTTON ---------- */
+    .back-to-top {
+      position: fixed; right: 20px; bottom: 80px;
+      width: 48px; height: 48px;
+      background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%;
+      color: #aaffdd; font-size: 1.2rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 500;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.2s ease, background 0.2s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
+    .back-to-top.visible { opacity: 1; pointer-events: auto; }
+    .back-to-top:hover { background: rgba(170,255,221,0.2); transform: translateY(-3px); }
+    .back-to-top:active { transform: scale(0.92); }
+
+    /* ---------- SWIPE DIRECTION OVERLAY ---------- */
+    .swipe-direction-overlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: 24px; pointer-events: none;
+      opacity: 0; transition: opacity 0.1s ease;
+      z-index: 5;
+    }
+    .swipe-direction-overlay.left {
+      background: linear-gradient(to right, rgba(255,80,80,0.18), transparent);
+      opacity: 1;
+    }
+    .swipe-direction-overlay.right {
+      background: linear-gradient(to left, rgba(100,255,180,0.18), transparent);
+      opacity: 1;
+    }
+
+    /* ---------- SURPRISE ME BUTTON ---------- */
+    .surprise-btn {
+      display: block; margin: 1.5rem auto 0;
+      background: linear-gradient(135deg, rgba(170,255,221,0.2), rgba(180,200,255,0.2));
+      backdrop-filter: blur(8px);
+      border: 1px dashed rgba(170,255,221,0.6); color: #aaffdd;
+      padding: 0.65rem 1.8rem;
+      font-family: 'Manrope', system-ui, sans-serif;
+      font-weight: 700; font-size: 0.9rem; cursor: pointer;
+      transition: all 0.25s ease; border-radius: 40px;
+      letter-spacing: 0.5px;
+    }
+    .surprise-btn:hover {
+      background: linear-gradient(135deg, rgba(170,255,221,0.3), rgba(180,200,255,0.3));
+      border-color: #aaffdd; transform: scale(1.04);
+      box-shadow: 0 0 18px rgba(170,255,221,0.3);
+    }
+    .surprise-btn:active { transform: scale(0.97); }
+
+    /* ---------- LOGO FALLBACK ---------- */
+    .logo-text-fallback {
+      font-family: 'Manrope', system-ui, sans-serif;
+      font-weight: 800; font-size: 0.85rem;
+      color: #aaffdd; letter-spacing: 2px;
+      text-transform: uppercase; display: none;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    .logo-img.hidden { display: none; }
+    .logo-img.hidden + .logo-text-fallback { display: block; }
+    /* ---------- PAUSE INTRO SCREEN ---------- */
+    #pauseScreen {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(24px);
+      padding: 2rem;
+      text-align: center;
+      opacity: 1;
+      transition: opacity 0.7s ease;
+    }
+    #pauseScreen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .pause-breath {
+      font-size: 3.5rem;
+      margin-bottom: 1.5rem;
+      animation: breathe 4s ease-in-out infinite;
+      display: inline-block;
+    }
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.15); opacity: 1; }
+    }
+    .pause-tagline {
+      font-family: 'Manrope', system-ui, sans-serif;
+      font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 4px; color: #aaffdd; font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .pause-heading {
+      font-family: 'Hypha', 'Times New Roman', 'Georgia', serif;
+      font-size: 2.6rem; font-weight: 800; line-height: 1.1;
+      color: white; margin-bottom: 1.25rem;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+    }
+    .pause-heading em {
+      font-style: italic; color: #aaffdd;
+    }
+    .pause-body {
+      font-family: 'Manrope', system-ui, sans-serif;
+      font-size: 1rem; color: rgba(255,255,255,0.8);
+      max-width: 360px; line-height: 1.65;
+      margin-bottom: 2.5rem;
+    }
+    .pause-cta {
+      background: rgba(170, 255, 221, 0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(170, 255, 221, 0.5);
+      color: #aaffdd;
+      padding: 0.85rem 2.2rem;
+      font-family: 'Manrope', system-ui, sans-serif;
+      font-size: 0.95rem; font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer; border-radius: 50px;
+      transition: all 0.25s ease;
+    }
+    .pause-cta:hover {
+      background: rgba(170, 255, 221, 0.28);
+      border-color: #aaffdd;
+      transform: scale(1.04);
+      box-shadow: 0 0 24px rgba(170,255,221,0.3);
+    }
+    .pause-skip {
+      margin-top: 1.2rem;
+      font-family: 'Manrope', system-ui, sans-serif;
+      font-size: 0.72rem; color: rgba(255,255,255,0.35);
+      cursor: pointer; letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+      background: none; border: none;
+    }
+    .pause-skip:hover { color: rgba(255,255,255,0.65); }
+
+    @media (max-width: 600px) {
+      .pause-heading { font-size: 2rem; }
+      .pause-breath { font-size: 2.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- PAUSE INTRO SCREEN -->
+<div id="pauseScreen">
+  <div class="pause-breath">✦</div>
+  <p class="pause-tagline">before you scroll</p>
+  <h2 class="pause-heading">take a breath.<br><em>you're in control.</em></h2>
+  <p class="pause-body">This space is designed to help you scroll less and live more. Before you dive in — notice how you feel right now. You're choosing intentionally.</p>
+  <button class="pause-cta" id="pauseCtaBtn">I'm ready →</button>
+  <button class="pause-skip" id="pauseSkipBtn">skip</button>
+</div>
+
+<div class="sky-fallback"></div>
+<div class="sky-background"></div>
+<div class="dark-overlay"></div>
+
+<div id="swipeFeedback" class="swipe-feedback">
+  <span class="feedback-icon" id="feedbackIcon">◀</span>
+  <span class="feedback-text" id="feedbackText">swipe</span>
+  <span class="feedback-action" id="feedbackAction">→ next card</span>
+</div>
+
+<div class="logo-container" id="logoContainer">
+  <img src="Text Logo.png" alt="Logo" class="logo-img" id="logoImg">
+  <span class="logo-text-fallback">scroll less</span>
+</div>
+
+<!-- BACK TO TOP BUTTON -->
+<button class="back-to-top" id="backToTopBtn" aria-label="Back to top">↑</button>
+
+<div id="helloBubble" class="hello-bubble">
+  <div class="bubble-content">
+    <span class="bubble-text" id="bubbleText">Hello</span>
+    <div class="bubble-controls">
+      <button id="hideBubbleBtn">✕ hide</button>
+      <button id="showBubbleBtn" style="display:none;">↻ show</button>
+    </div>
+  </div>
+</div>
+
+<div class="app-container" id="app">
+  <div id="landingScreen" class="landing-screen">
+    <div class="hero-mini">
+      <p>✦ ALGO-RHYTHM ✦</p>
+      <h1>scroll less · <span>algo-rhythm</span></h1>
+      <div class="letter-vibe">CHOOSE A VIBE // CHOOSE A RHYTHM</div>
+    </div>
+    <div class="choice-grid" id="choiceGrid">
+      <div class="choice-card" data-path="stay">
+        <div class="choice-icon">📱⚡</div>
+        <h2>stay on my phone</h2>
+        <p>block doomscrolling, read deeply, art nerd rituals, wordle</p>
+      </div>
+      <div class="i-want-divider">I want to</div>
+      <div class="choice-card" data-path="off">
+        <div class="choice-icon">🌿🔋</div>
+        <h2>get off my phone</h2>
+        <p>analog rituals, presence, real-world joy</p>
+      </div>
+    </div>
+    
+    <div id="mysteryMessage" class="mystery-message">
+      <div class="question-mark">🕵️</div>
+      <h3>still here, huh?</h3>
+      <p>you've unlocked both paths...<br>either you're very indecisive,<br>or you just <em>really</em> like popping bubbles. 🫧</p>
+      <button id="resetCardsBtn" class="reset-cards-btn">↻ give me the paths again</button>
+      <button class="surprise-btn" id="surpriseMeBtn">🎲 surprise me</button>
+    </div>
+  </div>
+
+  <div id="swipeScreen" class="swipe-screen">
+    <div class="swipe-header">
+      <button class="back-to-landing" id="backToLandingBtn">← BACK</button>
+      <div id="swipeTitle">stay · intentional</div>
+    </div>
+    <div class="card-stack" id="cardStack"></div>
+    <div class="indicators" id="indicators"></div>
+    <div style="display: flex; justify-content: center;">
+      <button class="reset-btn" id="resetSwipeBtn">⟳ START OVER</button>
+    </div>
+    <div class="counter" id="counter">cards left: --</div>
+    <div class="swipe-hint">
+      <span>◀ LEFT → next</span>
+      <span>RIGHT → open ▶</span>
+      <span class="hint-keys">← → keys</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- PAUSE INTRO SCREEN ----------
+  const pauseScreen = document.getElementById('pauseScreen');
+  function dismissPause() {
+    pauseScreen.classList.add('fade-out');
+    setTimeout(() => { pauseScreen.style.display = 'none'; }, 700);
+  }
+  document.getElementById('pauseCtaBtn').addEventListener('click', dismissPause);
+  document.getElementById('pauseSkipBtn').addEventListener('click', dismissPause);
+
+  // ---------- IMAGE ERROR HANDLING ----------
+  // Sky background image
+  const skyBg = document.querySelector('.sky-background');
+  if (skyBg) {
+    const testImg = new Image();
+    testImg.onerror = () => { skyBg.classList.add('img-error'); };
+    testImg.src = 'sky-clouds.jpg';
+  }
+
+  // Logo image
+  const logoImgEl = document.getElementById('logoImg');
+  if (logoImgEl) {
+    logoImgEl.addEventListener('error', () => {
+      logoImgEl.classList.add('hidden');
+    });
+  }
+
+  // ---------- BACK TO TOP BUTTON ----------
+  const backToTopBtn = document.getElementById('backToTopBtn');
+  let scrollTicking = false;
+  window.addEventListener('scroll', () => {
+    if (!scrollTicking) {
+      requestAnimationFrame(() => {
+        if (window.scrollY > 220) {
+          backToTopBtn.classList.add('visible');
+        } else {
+          backToTopBtn.classList.remove('visible');
+        }
+        scrollTicking = false;
+      });
+      scrollTicking = true;
+    }
+  }, { passive: true });
+  backToTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  const swipeFeedback = document.getElementById('swipeFeedback');
+  const feedbackIcon = document.getElementById('feedbackIcon');
+  const feedbackText = document.getElementById('feedbackText');
+  const feedbackAction = document.getElementById('feedbackAction');
+  let feedbackTimeout = null;
+  
+  function showFeedback(direction, action, icon) {
+    if (feedbackTimeout) clearTimeout(feedbackTimeout);
+    if (direction === 'left') {
+      feedbackIcon.textContent = '◀';
+      feedbackText.textContent = 'swipe left';
+      feedbackAction.textContent = action || '→ next card';
+    } else {
+      feedbackIcon.textContent = '▶';
+      feedbackText.textContent = 'swipe right';
+      feedbackAction.textContent = action || '→ open website';
+    }
+    swipeFeedback.classList.add('show');
+    feedbackTimeout = setTimeout(() => { swipeFeedback.classList.remove('show'); }, 400);
+  }
+  
+  const logo = document.getElementById('logoContainer');
+  const landingScreen = document.getElementById('landingScreen');
+  const swipeScreen = document.getElementById('swipeScreen');
+  const helloBubble = document.getElementById('helloBubble');
+  const choiceGrid = document.getElementById('choiceGrid');
+  const mysteryMessage = document.getElementById('mysteryMessage');
+  const resetCardsBtn = document.getElementById('resetCardsBtn');
+  
+  let cardsPoppedCount = 0;
+  let cardStay = null;
+  let cardOff = null;
+  let pathsVisited = new Set(); // track which paths have been visited
+  
+  function checkBothCardsPopped() {
+    // No longer shows the mystery message here — just let the card navigate
+  }
+  
+  function resetCards() {
+    cardsPoppedCount = 0;
+    pathsVisited.clear();
+    mysteryMessage.classList.remove('show');
+    choiceGrid.style.display = 'flex';
+    if (!cardStay || !cardStay.parentNode) {
+      choiceGrid.innerHTML = `
+        <div class="choice-card" data-path="stay">
+          <div class="choice-icon">📱⚡</div>
+          <h2>stay on my phone</h2>
+          <p>block doomscrolling, read deeply, art nerd rituals, wordle</p>
+        </div>
+        <div class="i-want-divider">I want to</div>
+        <div class="choice-card" data-path="off">
+          <div class="choice-icon">🌿🔋</div>
+          <h2>get off my phone</h2>
+          <p>analog rituals, presence, real-world joy</p>
+        </div>
+      `;
+      attachCardClickHandlers();
+      cardStay = document.querySelector('.choice-card[data-path="stay"]');
+      cardOff = document.querySelector('.choice-card[data-path="off"]');
+    } else {
+      cardStay.classList.remove('pop');
+      cardOff.classList.remove('pop');
+      cardStay.style.display = '';
+      cardOff.style.display = '';
+    }
+  }
+  
+  if (resetCardsBtn) resetCardsBtn.addEventListener('click', resetCards);
+
+  // ---------- SURPRISE ME BUTTON ----------
+  const surpriseMeBtn = document.getElementById('surpriseMeBtn');
+  if (surpriseMeBtn) {
+    surpriseMeBtn.addEventListener('click', () => {
+      // Playful countdown before rickroll
+      surpriseMeBtn.textContent = '🎲 ooh a surprise...';
+      surpriseMeBtn.disabled = true;
+      setTimeout(() => {
+        surpriseMeBtn.textContent = '🎶 loading your destiny...';
+      }, 600);
+      setTimeout(() => {
+        window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+        surpriseMeBtn.textContent = '🎲 surprise me';
+        surpriseMeBtn.disabled = false;
+      }, 1400);
+    });
+  }
+  
+  function resetToLanding() {
+    landingScreen.style.display = 'block';
+    swipeScreen.classList.remove('active');
+    activePath = null;
+    currentCardsData = [];
+    if (cardStack) cardStack.innerHTML = '';
+    resetCards();
+    if (helloBubble.classList.contains('hidden')) {
+      helloBubble.classList.remove('hidden');
+      if (hideBtn) hideBtn.style.display = 'inline-block';
+      if (showBtn) showBtn.style.display = 'none';
+    }
+    if (helloBubble.classList.contains('pop')) {
+      helloBubble.classList.remove('pop');
+      helloBubble.style.display = '';
+    }
+    if (intervalId) clearInterval(intervalId);
+    greetingIndex = 0;
+    if (bubbleText) bubbleText.textContent = greetings[0].word;
+    startCycle();
+  }
+  
+  logo.addEventListener('click', resetToLanding);
+
+  // ---------- LOGO STAR SPIN ----------
+  const logoImg = document.getElementById('logoImg');
+  let spinAngle = 0;
+  let spinRaf = null;
+  let spinPhase = 'idle'; // 'spinning' | 'settling' | 'idle'
+  let spinVelocity = 0;
+
+  function animateSpin() {
+    if (spinPhase === 'spinning') {
+      // Accelerate slowly up to ~3 deg/frame (was 18)
+      spinVelocity = Math.min(spinVelocity + 0.12, 3);
+    } else if (spinPhase === 'settling') {
+      // Friction bleed: ×0.40 per frame as specified
+      spinVelocity *= 0.40;
+    }
+    spinAngle += spinVelocity;
+    logoImg.style.transform = `rotate(${spinAngle}deg)`;
+
+    if (spinPhase === 'settling' && spinVelocity < 0.05) {
+      // Snap to nearest clean multiple of 360
+      const nearest = Math.round(spinAngle / 360) * 360;
+      logoImg.style.transition = 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      logoImg.style.transform = `rotate(${nearest}deg)`;
+      spinAngle = nearest % 360;
+      spinVelocity = 0;
+      spinPhase = 'idle';
+      cancelAnimationFrame(spinRaf);
+      spinRaf = null;
+      return;
+    }
+    spinRaf = requestAnimationFrame(animateSpin);
+  }
+
+  logo.addEventListener('mouseenter', () => {
+    logoImg.style.transition = 'none';
+    logoImg.style.filter = 'drop-shadow(0 4px 14px rgba(170,255,221,0.6))';
+    spinPhase = 'spinning';
+    spinVelocity = 0.8; // gentle initial kick (was 6)
+    if (!spinRaf) spinRaf = requestAnimationFrame(animateSpin);
+  });
+
+  logo.addEventListener('mouseleave', () => {
+    logoImg.style.filter = 'drop-shadow(0 2px 8px rgba(0,0,0,0.2))';
+    spinPhase = 'settling';
+  });
+  
+  const greetings = [
+    { lang: "English", word: "Hello" },
+    { lang: "Spanish", word: "Hola" },
+    { lang: "French", word: "Bonjour" },
+    { lang: "German", word: "Hallo" },
+    { lang: "Italian", word: "Ciao" },
+    { lang: "Portuguese", word: "Olá" },
+    { lang: "Dutch", word: "Hallo" },
+    { lang: "Russian", word: "Привет" },
+    { lang: "Japanese", word: "こんにちは" },
+    { lang: "Korean", word: "안녕하세요" },
+    { lang: "Chinese", word: "你好" },
+    { lang: "Arabic", word: "مرحبا" },
+    { lang: "Hindi", word: "नमस्ते" },
+    { lang: "Greek", word: "Γειά σου" },
+    { lang: "Swedish", word: "Hej" }
+  ];
+  
+  let greetingIndex = 0;
+  let intervalId;
+  const bubbleText = document.getElementById('bubbleText');
+  const hideBtn = document.getElementById('hideBubbleBtn');
+  const showBtn = document.getElementById('showBubbleBtn');
+  
+  function updateGreeting() {
+    if (bubbleText) bubbleText.textContent = greetings[greetingIndex].word;
+    greetingIndex = (greetingIndex + 1) % greetings.length;
+  }
+  function startCycle() {
+    if (intervalId) clearInterval(intervalId);
+    intervalId = setInterval(updateGreeting, 3000);
+  }
+  function stopCycle() {
+    if (intervalId) { clearInterval(intervalId); intervalId = null; }
+  }
+  
+  helloBubble.addEventListener('dblclick', (e) => {
+    e.stopPropagation();
+    helloBubble.classList.add('pop');
+    stopCycle();
+    setTimeout(() => { helloBubble.style.display = 'none'; helloBubble.classList.add('hidden'); }, 300);
+  });
+  
+  if (hideBtn) {
+    hideBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      helloBubble.classList.add('hidden');
+      stopCycle();
+      hideBtn.style.display = 'none';
+      showBtn.style.display = 'inline-block';
+    });
+  }
+  if (showBtn) {
+    showBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      helloBubble.classList.remove('hidden');
+      helloBubble.classList.remove('pop');
+      helloBubble.style.display = '';
+      startCycle();
+      hideBtn.style.display = 'inline-block';
+      showBtn.style.display = 'none';
+    });
+  }
+  
+  let isDraggingBubble = false;
+  let bubbleOffsetX = 0, bubbleOffsetY = 0;
+  helloBubble.addEventListener('mousedown', (e) => {
+    if (e.target.tagName === 'BUTTON') return;
+    isDraggingBubble = true;
+    const rect = helloBubble.getBoundingClientRect();
+    bubbleOffsetX = e.clientX - rect.left;
+    bubbleOffsetY = e.clientY - rect.top;
+    helloBubble.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
+  helloBubble.addEventListener('touchstart', (e) => {
+    if (e.target.tagName === 'BUTTON') return;
+    isDraggingBubble = true;
+    const rect = helloBubble.getBoundingClientRect();
+    const touch = e.touches[0];
+    bubbleOffsetX = touch.clientX - rect.left;
+    bubbleOffsetY = touch.clientY - rect.top;
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!isDraggingBubble) return;
+    let newLeft = e.clientX - bubbleOffsetX;
+    let newTop = e.clientY - bubbleOffsetY;
+    newLeft = Math.max(0, Math.min(window.innerWidth - helloBubble.offsetWidth, newLeft));
+    newTop = Math.max(0, Math.min(window.innerHeight - helloBubble.offsetHeight, newTop));
+    helloBubble.style.left = newLeft + 'px';
+    helloBubble.style.top = newTop + 'px';
+    helloBubble.style.bottom = 'auto';
+    helloBubble.style.right = 'auto';
+  });
+  window.addEventListener('touchmove', (e) => {
+    if (!isDraggingBubble) return;
+    const touch = e.touches[0];
+    let newLeft = touch.clientX - bubbleOffsetX;
+    let newTop = touch.clientY - bubbleOffsetY;
+    newLeft = Math.max(0, Math.min(window.innerWidth - helloBubble.offsetWidth, newLeft));
+    newTop = Math.max(0, Math.min(window.innerHeight - helloBubble.offsetHeight, newTop));
+    helloBubble.style.left = newLeft + 'px';
+    helloBubble.style.top = newTop + 'px';
+    helloBubble.style.bottom = 'auto';
+    helloBubble.style.right = 'auto';
+    e.preventDefault();
+  });
+  window.addEventListener('mouseup', () => { isDraggingBubble = false; helloBubble.style.cursor = 'grab'; });
+  window.addEventListener('touchend', () => { isDraggingBubble = false; });
+  startCycle();
+  
+  const STAY_CARDS = [
+    { icon: "🚫📲", title: "block the scroll", alternative: "StayFree → block Reels & Shorts", description: "Kill infinite loop, keep the app.", url: "https://stayfreeapps.com" },
+    { icon: "📌🎨", title: "intentional Pinterest", alternative: "curated vision boards", description: "Create, don't just consume.", url: "https://pinterest.com" },
+    { icon: "📰📚", title: "read deeply", alternative: "New Yorker · Atlantic · NYT", description: "Longform over shortform.", url: "https://newyorker.com" },
+    { icon: "🖼️🎭", title: "art nerd heaven", alternative: "Google Arts & Culture + quizzes", description: "Museums, games, movements.", url: "https://artsandculture.google.com" },
+    { icon: "🎧📖", title: "audiobooks & essays", alternative: "Libby · Paris Review", description: "Stories replace scrolling.", url: "https://libbyapp.com" },
+    { icon: "✍️📝", title: "write a reflection", alternative: "3 things you learned today", description: "Create > consume.", url: "https://750words.com" },
+    { icon: "🟩🔤", title: "wordle", alternative: "one puzzle a day — no infinite feed", description: "Five letters. Six tries. Done.", url: "https://www.nytimes.com/games/wordle/index.html" }
+  ];
+  
+  const OFF_CARDS = [
+    { icon: "☕🧘", title: "analog morning", alternative: "tea + window + no phone", description: "5 minutes of stillness.", url: null },
+    { icon: "📓✍️", title: "write by hand", alternative: "journal or morning pages", description: "Handwriting slows time.", url: null },
+    { icon: "🚶🌳", title: "walk & notice", alternative: "airplane mode walk", description: "Trees, sounds, architecture.", url: null },
+    { icon: "🎧💿", title: "full album", alternative: "no skipping, no scrolling", description: "Rediscover listening.", url: null },
+    { icon: "🧩🕯️", title: "tactile hobby", alternative: "puzzle · bake · tidy", description: "Small physical wins.", url: null },
+    { icon: "🗣️💬", title: "call a friend", alternative: "voice only", description: "Real connection.", url: null }
+  ];
+
+  let currentCardsData = [];
+  let activePath = null;
+  let isSwiping = false;
+  let dragStartX = 0;
+  let activeDragCard = null;
+  let activeCardIndex = 0;
+  const SWIPE_THRESHOLD = 50;
+  const FEEDBACK_THRESHOLD = 30;
+
+  const cardStack = document.getElementById('cardStack');
+  const indicatorsDiv = document.getElementById('indicators');
+  const counterSpan = document.getElementById('counter');
+  const swipeTitleElem = document.getElementById('swipeTitle');
+  const backBtn = document.getElementById('backToLandingBtn');
+  const resetSwipeBtn = document.getElementById('resetSwipeBtn');
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m;
+    });
+  }
+
+  function renderStack() {
+    cardStack.innerHTML = '';
+    for (let i = 0; i < currentCardsData.length; i++) {
+      const c = currentCardsData[i];
+      const div = document.createElement('div');
+      div.className = 'swipe-card';
+      div.setAttribute('data-card-index', i);
+      div.innerHTML = `
+        <div class="swipe-direction-overlay" aria-hidden="true"></div>
+        <div class="card-icon">${c.icon}</div>
+        <div class="card-title">${escapeHtml(c.title)}</div>
+        <div class="card-alternative">✨ ${escapeHtml(c.alternative)}</div>
+        <div class="card-description">${escapeHtml(c.description)}</div>
+      `;
+      cardStack.appendChild(div);
+    }
+    updateStackTransforms();
+    updateIndicatorsAndCounter();
+  }
+
+  function updateStackTransforms() {
+    const cards = document.querySelectorAll('.swipe-card');
+    cards.forEach((card, idx) => {
+      const depth = idx;
+      const scale = Math.max(0.92, 1 - depth * 0.04);
+      const translateY = depth * 8;
+      const opacity = depth === 0 ? 1 : Math.max(0.3, 1 - depth * 0.25);
+      card.style.transform = `translateY(${translateY}px) scale(${scale})`;
+      card.style.opacity = opacity;
+      card.style.zIndex = 100 - depth;
+      card.style.pointerEvents = depth === 0 ? 'auto' : 'none';
+    });
+  }
+
+  function updateIndicatorsAndCounter() {
+    const total = currentCardsData.length;
+    const remaining = document.querySelectorAll('.swipe-card').length;
+    indicatorsDiv.innerHTML = '';
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('div');
+      dot.className = `dot ${(total - i) === remaining ? 'active' : ''}`;
+      indicatorsDiv.appendChild(dot);
+    }
+    counterSpan.innerText = remaining === 0 ? '✨ ALL DONE – RESET ✨' : `cards left: ${remaining}`;
+    if (remaining === 0 && !document.querySelector('.empty-state')) {
+      const emptyMsg = document.createElement('div');
+      emptyMsg.className = 'empty-state';
+      emptyMsg.innerHTML = `<h3>⚡ YOU MADE IT ⚡</h3><p>reset to swipe again</p>`;
+      cardStack.appendChild(emptyMsg);
+    } else if (remaining > 0) {
+      const existing = cardStack.querySelector('.empty-state');
+      if (existing) existing.remove();
+    }
+  }
+
+  function getCurrentCard() { return document.querySelector('.swipe-card'); }
+  function getCurrentCardData() {
+    if (currentCardsData.length === 0) return null;
+    return currentCardsData[0];
+  }
+
+  function swipeLeft() {
+    const topCard = getCurrentCard();
+    if (!topCard) return;
+    showFeedback('left', '→ next card', '◀');
+    topCard.style.transition = 'transform 0.45s ease, opacity 0.45s';
+    topCard.style.transform = `translateX(-500px) rotate(-8deg)`;
+    topCard.style.opacity = '0';
+    setTimeout(() => {
+      topCard.remove();
+      if (currentCardsData.length) currentCardsData.shift();
+      updateStackTransforms();
+      updateIndicatorsAndCounter();
+    }, 400);
+  }
+
+  function swipeRight() {
+    const topCard = getCurrentCard();
+    if (!topCard) return;
+    const cardData = getCurrentCardData();
+    const isStayMode = (activePath === 'stay');
+    if (isStayMode && cardData && cardData.url) {
+      showFeedback('right', '→ opening website', '▶');
+      topCard.style.transition = 'transform 0.45s ease, opacity 0.45s';
+      topCard.style.transform = `translateX(500px) rotate(8deg)`;
+      topCard.style.opacity = '0';
+      const url = cardData.url;
+      setTimeout(() => {
+        topCard.remove();
+        if (currentCardsData.length) currentCardsData.shift();
+        updateStackTransforms();
+        updateIndicatorsAndCounter();
+        window.open(url, '_blank');
+      }, 400);
+    } else {
+      showFeedback('right', '→ next card (off mode)', '▶');
+      topCard.style.transition = 'transform 0.45s ease, opacity 0.45s';
+      topCard.style.transform = `translateX(500px) rotate(8deg)`;
+      topCard.style.opacity = '0';
+      setTimeout(() => {
+        topCard.remove();
+        if (currentCardsData.length) currentCardsData.shift();
+        updateStackTransforms();
+        updateIndicatorsAndCounter();
+      }, 400);
+    }
+  }
+
+  function resetStack() {
+    if (activePath === 'stay') currentCardsData = JSON.parse(JSON.stringify(STAY_CARDS));
+    else if (activePath === 'off') currentCardsData = JSON.parse(JSON.stringify(OFF_CARDS));
+    renderStack();
+  }
+
+  function onDragStart(e, card) {
+    if (!card) return;
+    activeDragCard = card;
+    let clientX;
+    if (e.type === 'touchstart') { clientX = e.touches[0].clientX; e.preventDefault(); }
+    else { clientX = e.clientX; e.preventDefault(); }
+    dragStartX = clientX;
+    isSwiping = true;
+    activeDragCard.style.transition = 'none';
+    activeDragCard.style.cursor = 'grabbing';
+  }
+
+  let dragRafPending = false;
+  let lastDragX = 0;
+
+  function onDragMove(e) {
+    if (!isSwiping || !activeDragCard) return;
+    let currentX;
+    if (e.type === 'touchmove') {
+      if (e.touches && e.touches[0]) currentX = e.touches[0].clientX;
+      else return;
+      e.preventDefault();
+    } else {
+      currentX = e.clientX;
+      e.preventDefault();
+    }
+    lastDragX = currentX;
+
+    if (dragRafPending) return;
+    dragRafPending = true;
+    requestAnimationFrame(() => {
+      dragRafPending = false;
+      if (!isSwiping || !activeDragCard) return;
+      const deltaX = lastDragX - dragStartX;
+      const rotate = deltaX * 0.03;
+      activeDragCard.style.transform = `translateX(${deltaX}px) rotate(${rotate}deg)`;
+      activeDragCard.style.opacity = Math.min(1, 1 - Math.abs(deltaX) / 500);
+
+      // Update direction overlay
+      const overlay = activeDragCard.querySelector('.swipe-direction-overlay');
+      if (overlay) {
+        overlay.className = 'swipe-direction-overlay';
+        if (Math.abs(deltaX) > FEEDBACK_THRESHOLD) {
+          overlay.classList.add(deltaX > 0 ? 'right' : 'left');
+        }
+      }
+
+      if (Math.abs(deltaX) > FEEDBACK_THRESHOLD && !swipeFeedback.classList.contains('show')) {
+        if (deltaX > 0) {
+          const cardData = getCurrentCardData();
+          const isStayMode = (activePath === 'stay');
+          if (isStayMode && cardData && cardData.url) { showFeedback('right', '→ open website', '▶'); }
+          else { showFeedback('right', '→ next card', '▶'); }
+        } else { showFeedback('left', '→ next card', '◀'); }
+      }
+    });
+  }
+
+  function onDragEnd(e) {
+    if (!isSwiping || !activeDragCard) { isSwiping = false; activeDragCard = null; return; }
+    let endX = dragStartX;
+    if (e.type === 'touchend') { if (e.changedTouches && e.changedTouches[0]) endX = e.changedTouches[0].clientX; }
+    else { endX = e.clientX; }
+    const deltaX = endX - dragStartX;
+    if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
+      if (deltaX > 0) { swipeRight(); } else { swipeLeft(); }
+      swipeFeedback.classList.remove('show');
+      if (feedbackTimeout) clearTimeout(feedbackTimeout);
+    } else {
+      activeDragCard.style.transition = 'transform 0.45s ease, opacity 0.45s';
+      activeDragCard.style.transform = '';
+      activeDragCard.style.opacity = '1';
+      // Clear direction overlay
+      const overlay = activeDragCard.querySelector('.swipe-direction-overlay');
+      if (overlay) overlay.className = 'swipe-direction-overlay';
+      swipeFeedback.classList.remove('show');
+      if (feedbackTimeout) clearTimeout(feedbackTimeout);
+    }
+    isSwiping = false;
+    activeDragCard = null;
+    dragRafPending = false;
+  }
+
+  if (cardStack) {
+    cardStack.addEventListener('touchstart', (e) => {
+      const top = getCurrentCard();
+      if (top && top.contains(e.target)) onDragStart(e, top);
+    });
+    cardStack.addEventListener('mousedown', (e) => {
+      const top = getCurrentCard();
+      if (top && top.contains(e.target)) onDragStart(e, top);
+    });
+  }
+  window.addEventListener('touchmove', (e) => { if (isSwiping) e.preventDefault(); onDragMove(e); }, { passive: false });
+  window.addEventListener('mousemove', onDragMove);
+  window.addEventListener('touchend', onDragEnd);
+  window.addEventListener('mouseup', onDragEnd);
+
+  window.addEventListener('keydown', (e) => {
+    if (swipeScreen.classList.contains('active') && getCurrentCard()) {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        showFeedback('left', '→ next card', '◀');
+        setTimeout(() => swipeLeft(), 50);
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        const cardData = getCurrentCardData();
+        const isStayMode = (activePath === 'stay');
+        if (isStayMode && cardData && cardData.url) { showFeedback('right', '→ open website', '▶'); }
+        else { showFeedback('right', '→ next card', '▶'); }
+        setTimeout(() => swipeRight(), 50);
+      }
+    }
+  });
+
+  function handleCardClick(card, path) {
+    card.classList.add('pop');
+    cardsPoppedCount++;
+    checkBothCardsPopped();
+    setTimeout(() => { selectPath(path); }, 300);
+  }
+
+  function attachCardClickHandlers() {
+    const cards = document.querySelectorAll('.choice-card');
+    cards.forEach(card => {
+      const newCard = card.cloneNode(true);
+      card.parentNode.replaceChild(newCard, card);
+      const path = newCard.getAttribute('data-path');
+      newCard.addEventListener('click', () => { handleCardClick(newCard, path); });
+    });
+    cardStay = document.querySelector('.choice-card[data-path="stay"]');
+    cardOff = document.querySelector('.choice-card[data-path="off"]');
+  }
+
+  function selectPath(path) {
+    if (landingScreen.style.display === 'none') return;
+    activePath = path;
+    pathsVisited.add(path);
+    if (path === 'stay') { currentCardsData = JSON.parse(JSON.stringify(STAY_CARDS)); swipeTitleElem.innerText = 'stay · intentional'; }
+    else { currentCardsData = JSON.parse(JSON.stringify(OFF_CARDS)); swipeTitleElem.innerText = 'off · analog joy'; }
+    renderStack();
+    landingScreen.style.display = 'none';
+    swipeScreen.classList.add('active');
+  }
+
+  function backToLanding() {
+    landingScreen.style.display = 'block';
+    swipeScreen.classList.remove('active');
+    activePath = null;
+    currentCardsData = [];
+    if (cardStack) cardStack.innerHTML = '';
+    attachCardClickHandlers();
+    swipeFeedback.classList.remove('show');
+    if (feedbackTimeout) clearTimeout(feedbackTimeout);
+    // Show mystery message only after user has visited both paths and returned
+    if (pathsVisited.has('stay') && pathsVisited.has('off')) {
+      choiceGrid.style.display = 'none';
+      mysteryMessage.classList.add('show');
+    }
+  }
+
+  attachCardClickHandlers();
+  if (backBtn) backBtn.addEventListener('click', backToLanding);
+  if (resetSwipeBtn) resetSwipeBtn.addEventListener('click', () => { if (activePath) resetStack(); });
+
+  landingScreen.style.display = 'block';
+  swipeScreen.classList.remove('active');
+
+  // ---------- SPARKLE CURSOR TRAIL ----------
+  // Active on: hello bubble + choice cards
+  const SPARKLE_CHARS = ['✦','★','✶','·','✸','✺','⋆','*'];
+  const SPARKLE_COLORS = ['#aaffdd','#fff','#ffe066','#b4f0ff','#ffb3de','#d4aaff'];
+
+  let sparkleActive = false;
+  let lastSparkleTime = 0;
+  const SPARKLE_INTERVAL = 90; // ms — throttled for mobile perf (was 50)
+  let activeSparkleCount = 0;
+  const MAX_SPARKLES = 18; // cap DOM nodes
+
+  function spawnSparkle(x, y) {
+    if (activeSparkleCount >= MAX_SPARKLES) return; // performance cap
+    activeSparkleCount++;
+    const el = document.createElement('span');
+    const char = SPARKLE_CHARS[Math.floor(Math.random() * SPARKLE_CHARS.length)];
+    const color = SPARKLE_COLORS[Math.floor(Math.random() * SPARKLE_COLORS.length)];
+    const size = 10 + Math.random() * 14;
+    const angle = (Math.random() - 0.5) * 60; // slight spread
+    const drift = (Math.random() - 0.5) * 20;
+    const rise = -(18 + Math.random() * 22);
+
+    el.textContent = char;
+    el.style.cssText = `
+      position: fixed;
+      left: ${x + (Math.random() - 0.5) * 16}px;
+      top: ${y + (Math.random() - 0.5) * 16}px;
+      font-size: ${size}px;
+      color: ${color};
+      pointer-events: none;
+      z-index: 99999;
+      user-select: none;
+      text-shadow: 0 0 6px ${color};
+      transform: rotate(${angle}deg) translate(0,0);
+      opacity: 1;
+      transition: none;
+    `;
+    document.body.appendChild(el);
+
+    // Animate: float up + fade out
+    const start = performance.now();
+    const duration = 900 + Math.random() * 600;
+
+    function tick(now) {
+      const t = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(t, 2);
+      el.style.opacity = ease;
+      el.style.transform = `rotate(${angle + t * 20}deg) translate(${drift * t}px, ${rise * t}px) scale(${1 - t * 0.4})`;
+      if (t < 1) {
+        requestAnimationFrame(tick);
+      } else {
+        el.remove();
+        activeSparkleCount--;
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function onSparkleMove(e) {
+    if (!sparkleActive) return;
+    const now = Date.now();
+    if (now - lastSparkleTime < SPARKLE_INTERVAL) return;
+    lastSparkleTime = now;
+    const x = e.clientX ?? (e.touches && e.touches[0]?.clientX);
+    const y = e.clientY ?? (e.touches && e.touches[0]?.clientY);
+    if (x == null || y == null) return;
+    // single sparkle per tick on mobile, occasional double on desktop
+    spawnSparkle(x, y);
+    if (!('ontouchstart' in window) && Math.random() > 0.65) spawnSparkle(x, y);
+  }
+
+  function attachSparkleTarget(el) {
+    el.addEventListener('mouseenter', () => { sparkleActive = true; });
+    el.addEventListener('mouseleave', () => { sparkleActive = false; });
+    el.addEventListener('touchstart', () => { sparkleActive = true; }, { passive: true });
+    el.addEventListener('touchend', () => { sparkleActive = false; }, { passive: true });
+  }
+
+  // Attach to hello bubble
+  attachSparkleTarget(helloBubble);
+
+  // Attach to choice cards (and re-attach when cards are reset)
+  function attachSparkleToCards() {
+    document.querySelectorAll('.choice-card').forEach(attachSparkleTarget);
+  }
+  attachSparkleToCards();
+
+  // Re-attach after resetCards rebuilds the DOM
+  const _origResetCards = resetCards;
+  // Patch: observe choiceGrid for new cards
+  const cardObserver = new MutationObserver(() => { attachSparkleToCards(); });
+  cardObserver.observe(choiceGrid, { childList: true });
+
+  window.addEventListener('mousemove', onSparkleMove);
+  window.addEventListener('touchmove', onSparkleMove, { passive: true });
+</script>
+</body>
+</html>
