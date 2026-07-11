@@ -5,31 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>weaving webs of wonder</title>
   <style>
-    body {
+    html, body {
       margin: 0;
-      min-height: 100vh;
+      height: 100%;
       background: #fff;
-      font-family: system-ui, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 32px;
-      box-sizing: border-box;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      overflow: hidden;
     }
-    .stage {
-      position: relative;
-      display: inline-block;
-      max-width: 100%;
-      line-height: 0;
+    #wall {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
     }
-    .stage img {
+    #wall img {
+      position: absolute;
       display: block;
-      max-width: 100%;
-      max-height: 90vh;
-      height: auto;
-      width: auto;
+      object-fit: contain;
+      transform-origin: center center;
     }
-    .stage a {
+    #links {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+    #links a {
       position: absolute;
       transform: translate(-50%, -50%);
       color: #1a0dab;
@@ -37,26 +38,162 @@
       font-size: 18px;
       line-height: 1.2;
       white-space: nowrap;
-      text-shadow: 0 0 4px #fff, 0 0 4px #fff;
+      pointer-events: auto;
+      text-shadow: 0 0 4px #fff, 0 0 4px #fff, 0 0 4px #fff, 0 0 4px #fff;
     }
-    .stage a:visited { color: #1a0dab; }
+    #links a:visited { color: #1a0dab; }
+    #about {
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      z-index: 20;
+      font-family: inherit;
+    }
   </style>
 </head>
 <body>
-  <div class="stage" id="stage"><img id="img" alt="" /></div>
+  <div id="wall"></div>
+  <div id="links"></div>
+  <button id="about" onclick="location.href='about.html'">about</button>
   <script>
+    // Per-image placement is seeded from the filename, so editing one image never moves the others.
+    function mulberry32(seed) {
+      return function () {
+        seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+        let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+    function hashStr(str) {
+      let h = 2166136261 >>> 0;
+      for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+      return h >>> 0;
+    }
+
     fetch('pages.json').then(r => r.json()).then(data => {
-      const img = document.getElementById('img');
-      img.src = data.image;
-      img.alt = data.imageAlt || '';
-      const stage = document.getElementById('stage');
-      for (const p of data.pages) {
+      const wall = document.getElementById('wall');
+      const links = document.getElementById('links');
+      const imgs = data.wall || [];
+      const N = imgs.length;
+
+      const MAIN_NAME = 'Manifesto-part-2_page-0020';
+      const TALL = 2.0;
+      const mainIdx = imgs.findIndex(s => s.includes(MAIN_NAME));
+      const aspect = imgs.map(() => 1.45);
+      if (mainIdx >= 0) aspect[mainIdx] = 2.48;
+
+      const byHash = [...Array(N).keys()].sort((a, b) => hashStr(imgs[a]) - hashStr(imgs[b]));
+
+      const els = imgs.map((src, idx) => {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = '';
+        img.loading = 'lazy';
+        img.addEventListener('load', () => {
+          if (img.naturalWidth) aspect[idx] = img.naturalHeight / img.naturalWidth;
+          scheduleLayout();
+        });
+        wall.appendChild(img);
+        return img;
+      });
+
+      const kindOf = idx =>
+        idx === mainIdx ? 'main' : (aspect[idx] > TALL ? 'long' : 'normal');
+
+      // Fill a viewport-% rectangle with a grid, sizing every image to the largest
+      // uniform height at which they all fit, placed by natural aspect.
+      function placeGrid(list, x0, x1, y0, y1, winW, winH) {
+        const n = list.length;
+        if (!n || x1 <= x0) return;
+        const bandWpx = (x1 - x0) / 100 * winW;
+        const bandHpx = (y1 - y0) / 100 * winH;
+        const AR = 1.45;
+        const spacing = 1.12;
+        let best = { cols: 1, rows: n, h: 0 };
+        for (let cols = 1; cols <= n; cols++) {
+          const rows = Math.ceil(n / cols);
+          const h = Math.min((bandWpx / cols) / spacing * AR, (bandHpx / rows) / spacing);
+          if (h > best.h) best = { cols, rows, h };
+        }
+        const { cols, rows, h } = best;
+        const cellW = bandWpx / cols, cellH = bandHpx / rows;
+        list.forEach((idx, i) => {
+          const r = mulberry32(hashStr(imgs[idx]));
+          const col = i % cols, row = Math.floor(i / cols);
+          const cx = x0 / 100 * winW + (col + 0.5) * cellW + (r() - 0.5) * cellW * 0.25;
+          const cy = y0 / 100 * winH + (row + 0.5) * cellH + (r() - 0.5) * cellH * 0.25;
+          const img = els[idx];
+          img.style.left = (cx / winW * 100) + '%';
+          img.style.top = (cy / winH * 100) + '%';
+          img.style.transform = 'translate(-50%, -50%)';
+          img.style.height = (h / winH * 100) + 'vh';
+          img.style.width = 'auto';
+          img.style.zIndex = 20 + Math.floor(r() * 60);
+        });
+      }
+
+      function layout() {
+        const winW = window.innerWidth, winH = window.innerHeight;
+
+        let halfZone = 20;
+        if (mainIdx >= 0) {
+          const m = els[mainIdx];
+          const mainWpct = (winH / aspect[mainIdx]) / winW * 100;
+          m.style.left = '50%';
+          m.style.top = '50%';
+          m.style.transform = 'translate(-50%, -50%)';
+          m.style.height = '100vh';
+          m.style.width = 'auto';
+          m.style.zIndex = 500;
+          halfZone = mainWpct / 2 + 0.5;
+        }
+
+        const leftBand = [4, 50 - halfZone];
+        const rightBand = [50 + halfZone, 96];
+        const yTop = 5, yBot = 95;
+
+        const normals = byHash.filter(i => kindOf(i) === 'normal');
+        const left = [], right = [];
+        normals.forEach((idx, k) => (k % 2 ? right : left).push(idx));
+        placeGrid(left, leftBand[0], leftBand[1], yTop, yBot, winW, winH);
+        placeGrid(right, rightBand[0], rightBand[1], yTop, yBot, winW, winH);
+
+        // Long pages: big and behind, on both sides.
+        const longs = byHash.filter(i => kindOf(i) === 'long');
+        longs.forEach((idx, k) => {
+          const band = k % 2 ? rightBand : leftBand;
+          const r = mulberry32(hashStr(imgs[idx]) ^ 0x9e3779b9);
+          const img = els[idx];
+          img.style.left = (band[0] + r() * Math.max(1, band[1] - band[0])) + '%';
+          img.style.top = (22 + r() * 56) + '%';
+          img.style.transform = 'translate(-50%, -50%)';
+          img.style.height = (62 + r() * 26) + 'vh';
+          img.style.width = 'auto';
+          img.style.zIndex = 2 + Math.floor(r() * 4);
+        });
+      }
+      let layoutQueued = false;
+      function scheduleLayout() {
+        if (layoutQueued) return;
+        layoutQueued = true;
+        requestAnimationFrame(() => { layoutQueued = false; layout(); });
+      }
+      layout();
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(layout, 100);
+      });
+
+      for (const p of (data.pages || [])) {
         const a = document.createElement('a');
         a.href = `webpages-workshop/${p.folder}/`;
         a.textContent = p.title;
         a.style.left = p.x + '%';
         a.style.top = p.y + '%';
-        stage.appendChild(a);
+        links.appendChild(a);
       }
     });
   </script>
