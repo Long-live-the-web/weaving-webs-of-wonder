@@ -3,28 +3,64 @@
   "imageAlt": "weaving webs of wonder",
   "pages": [
     {
+      "folder": "brush-my-teeth-game",
+      "title": "brush my teeth",
+      "x": 80,
+      "y": 38
+    },
+    {
+      "folder": "do-you-see-me",
+      "title": "do you see me?",
+      "x": 50,
+      "y": 38
+    },
+    {
       "folder": "dontbeevil",
       "title": "don't be evil",
       "x": 20,
-      "y": 85
+      "y": 15
     },
     {
       "folder": "localNetwork",
       "title": "your new WIP digital doorstep",
       "x": 20,
-      "y": 50
+      "y": 38
+    },
+    {
+      "folder": "remember-when",
+      "title": "remember when",
+      "x": 20,
+      "y": 62
+    },
+    {
+      "folder": "screenshot2",
+      "title": "screenshot",
+      "x": 50,
+      "y": 62
+    },
+    {
+      "folder": "screenshotheaven",
+      "title": "screenshot heaven",
+      "x": 80,
+      "y": 62
+    },
+    {
+      "folder": "scroll-less",
+      "title": "scroll-less",
+      "x": 50,
+      "y": 85
     },
     {
       "folder": "scrolling-timer",
       "title": "scrolling timer",
       "x": 50,
-      "y": 85
+      "y": 15
     },
     {
       "folder": "wander-flaneur",
       "title": "wander flâneur",
       "x": 80,
-      "y": 85
+      "y": 15
     }
   ]
 }
