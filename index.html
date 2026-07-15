@@ -50,11 +50,27 @@
       z-index: 20;
       font-family: inherit;
     }
+    #mobile { display: none; }
+    @media (max-width: 700px) {
+      html, body { overflow: auto; height: auto; }
+      #wall, #links { display: none; }
+      #mobile { display: block; padding: 24px 16px 88px; }
+      #mobile .m-links {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 32px;
+      }
+      #mobile .m-links a { color: #1a0dab; text-decoration: underline; font-size: 18px; }
+      #mobile .m-imgs img { display: block; width: 100%; margin: 0 auto 12px; }
+    }
   </style>
 </head>
 <body>
   <div id="wall"></div>
   <div id="links"></div>
+  <div id="mobile"></div>
   <button id="about" onclick="location.href='about.html'">about</button>
   <script>
     // Per-image placement is seeded from the filename, so editing one image never moves the others.
@@ -195,6 +211,26 @@
         a.style.top = p.y + '%';
         links.appendChild(a);
       }
+
+      const mobile = document.getElementById('mobile');
+      const mLinks = document.createElement('div');
+      mLinks.className = 'm-links';
+      for (const p of (data.pages || [])) {
+        const a = document.createElement('a');
+        a.href = `webpages-workshop/${p.folder}/`;
+        a.textContent = p.title;
+        mLinks.appendChild(a);
+      }
+      const mImgs = document.createElement('div');
+      mImgs.className = 'm-imgs';
+      for (const src of imgs) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = '';
+        img.loading = 'lazy';
+        mImgs.appendChild(img);
+      }
+      mobile.append(mLinks, mImgs);
     });
   </script>
 </body>
