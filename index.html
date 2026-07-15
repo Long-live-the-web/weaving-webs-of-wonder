@@ -223,7 +223,10 @@
       }
       const mImgs = document.createElement('div');
       mImgs.className = 'm-imgs';
-      for (const src of imgs) {
+      const mobileOrder = mainIdx >= 0
+        ? [imgs[mainIdx], ...imgs.filter((_, i) => i !== mainIdx)]
+        : imgs;
+      for (const src of mobileOrder) {
         const img = document.createElement('img');
         img.src = src;
         img.alt = '';
