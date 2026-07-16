@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>weaving webs of wonder</title>
+  <!-- Preload the centered main image so it starts downloading before JS/pages.json. -->
+  <link rel="preload" as="image" href="wall-imgs/all/Manifesto-part-2_page-0020.webp" fetchpriority="high" />
   <style>
     html, body {
       margin: 0;
@@ -106,7 +108,9 @@
         const img = document.createElement('img');
         img.src = src;
         img.alt = '';
-        img.loading = 'lazy';
+        // Load the centered main image first; the rest stay lazy.
+        if (idx === mainIdx) { img.loading = 'eager'; img.fetchPriority = 'high'; }
+        else { img.loading = 'lazy'; }
         img.addEventListener('load', () => {
           if (img.naturalWidth) aspect[idx] = img.naturalHeight / img.naturalWidth;
           scheduleLayout();
